@@ -1,0 +1,24 @@
+on:
+  push:
+    branches: [master]
+
+jobs:
+  merge:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: download merger
+        run: curl -O -L https://github.com/zhanhb/cidr-merger/releases/download/v1.1.3/cidr-merger-linux-amd64
+      - name: set x perm
+        run: chmod +x cidr-merger-linux-amd64
+      - name: make copy of original
+        run: cp -v list.txt list_copy.txt
+      - name: do the merge
+        run: ./cidr-merger-linux-amd64 --merge list_copy.txt > list.txt
+      - name: remove copy and merger binary
+        run: rm -v list_copy.txt cidr-merger-linux-amd64
+      - name: commit change
+        uses: stefanzweifel/git-auto-commit-action@v5
